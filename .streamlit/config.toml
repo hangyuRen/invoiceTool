@@ -1,0 +1,12 @@
+[global]
+developmentMode = false
+
+[server]
+headless = true
+address = "localhost"
+port = 8501
+
+[browser]
+
+serverAddress = "localhost"
+gatherUsageStats = false  # 关键：禁止收集数据，跳过邮箱提示
