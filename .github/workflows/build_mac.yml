@@ -1,0 +1,49 @@
+name: Build Mac App
+
+# 触发条件：当代码推送到 main 分支时自动运行
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch: # 允许手动点击按钮触发
+
+jobs:
+  build:
+    runs-on: macos-latest  # 指定使用最新版的 macOS 服务器
+
+    steps:
+    # 1. 拉取你的代码
+    - uses: actions/checkout@v3
+
+    # 2. 安装 Python 3.9 (推荐用这个版本，比较稳定)
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.9"
+
+    # 3. 安装依赖库
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    # 4. 执行打包命令 (Mac版专用)
+    # 注意：Mac 下的分隔符是冒号 : 而不是分号 ;
+    - name: Build with PyInstaller
+      run: |
+        pyinstaller --name "InvoiceTool_Mac" \
+          --onefile \
+          --windowed \
+          --additional-hooks-dir=. \
+          --add-data "app.py:." \
+          --add-data ".streamlit:./.streamlit" \
+          --collect-all streamlit \
+          --collect-all pdfplumber \
+          --clean \
+          run.py
+
+    # 5. 上传打包结果供你下载
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: InvoiceTool_Mac_App
+        path: dist/InvoiceTool_Mac
